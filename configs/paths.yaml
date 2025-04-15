@@ -1,0 +1,3 @@
+data_path: "./data/fashion-product-images-small"
+image_base_path: "./data/fashion-product-images-small/myntradataset/images"
+knowledge_index: "./data/fashion_knowledge.index"
