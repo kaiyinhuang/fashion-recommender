@@ -38,12 +38,20 @@ class EnhancedRecommender:
         return candidates.sort_values("score", ascending=False).head(top_k)
     
     def _calculate_score(self, row, params):
-        """动态权重评分"""
-        score = 0
-        # 颜色匹配
-        color_overlap = len(set(row["baseColour"]) & set(params.get("colors", [])))
-        score += self.weights["color"] * (color_overlap / max(1, len(params.get("colors", []))))
-        # 类型模糊匹配
-        type_sim = fuzz.partial_ratio(row["articleType"], params.get("type", "")) / 100
-        score += self.weights["type"] * type_sim
-        return score
+            # 增强评分逻辑
+            score = 0
+            
+            # 颜色匹配
+            color_match = len(set(row["baseColour"]) & set(params["colors"]))
+            score += self.feature_weights["color"] * (color_match / len(params["colors"])) if params["colors"] else 0
+            
+            # 风格匹配
+            style_sim = max([fuzz.ratio(style, row["articleType"]) for style in params["styles"]])/100
+            score += self.feature_weights["style"] * style_sim
+            
+            # 材质匹配
+            material_match = any(material in row["material"] for material in params["materials"])
+            score += self.feature_weights["material"] * material_match
+            
+            return score
+
