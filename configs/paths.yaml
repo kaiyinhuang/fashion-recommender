@@ -1,3 +1,8 @@
 data_path: "./data/fashion-product-images-small"
 image_base_path: "./data/fashion-product-images-small/myntradataset/images"
 knowledge_index: "./data/fashion_knowledge.index"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  docs_url: "/docs"
