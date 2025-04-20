@@ -1,25 +1,37 @@
-import faiss
-import json
-from sentence_transformers import SentenceTransformer
+import pandas as pd
+from .knowledge_builder import KnowledgeBuilder
 
-class FashionRAG:
-    def __init__(self, index_path="data/fashion_knowledge.index", 
-                 knowledge_path="data/fashion_knowledge.json"):
-        with open(knowledge_path) as f:
-            self.knowledge = json.load(f)
-        self.index = faiss.read_index(index_path)
-        self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
-    
+class EnhancedFashionRAG:
+    def __init__(self, config):
+        self.knowledge = pd.read_csv(config["knowledge_path"])
+        self.index = faiss.read_index(config["index_path"])
+        self.encoder = KnowledgeBuilder().encoder
+        self.threshold = 0.6  # 相似度阈值
+
     def parse_query(self, query):
-        """自然语言解析为推荐参数"""
-        # 向量化查询
+        # 增强版参数解析
         query_embed = self.encoder.encode([query])
-        _, indices = self.index.search(query_embed, 2)
+        distances, indices = self.index.search(query_embed, 3)
         
-        # 提取参数
-        params = {"colors": [], "types": []}
-        for idx in indices[0]:
-            item = self.knowledge[idx]
-            params["colors"].extend(item.get("colors", []))
-            params["types"].extend(item.get("garments", []))
-        return params
+        params = {
+            "colors": [],
+            "styles": [],
+            "materials": []
+        }
+        
+        for idx, score in zip(indices[0], distances[0]):
+            if score < self.threshold:
+                item = self.knowledge.iloc[idx]
+                params["colors"].extend(item["baseColour"])
+                params["styles"].append(item["推荐款式"])
+                params["materials"].append(item["面料建议"])
+        
+        return self._deduplicate_params(params)
+
+    def _deduplicate_params(self, params):
+        # 去重逻辑
+        return {
+            "colors": list(set(params["colors"])),
+            "styles": list(set(params["styles"])),
+            "materials": list(set(params["materials"]))
+        }
