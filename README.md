@@ -11,24 +11,14 @@ Fashion Recommendation System with RAG
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
-./scripts/setup_data.sh
+bash scripts/build_knowledge.sh
 ```
 
-2. Run the example：
 ```bash
-from core.data_processor import DataProcessor
-from core.recommender import EnhancedRecommender
-from core.rag_system import FashionRAG
-
-# 初始化系统
-processor = DataProcessor("data/fashion-product-images-small/myntradataset")
-df = processor.load_and_clean()
-rag = FashionRAG()
-recommender = EnhancedRecommender(df, rag=rag)
-
-# 获取推荐
-results = recommender.recommend("适合夏季派对的复古连衣裙")
+pytest tests/test_rag.py
 ```
+
+
 
 
 ### **Key optimization points**
