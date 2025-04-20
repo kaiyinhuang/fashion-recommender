@@ -5,9 +5,9 @@ from .rag_system import FashionRAG
 class EnhancedRecommender:
     def __init__(self, df, rag=None, image_base_path=None):
         self.df = df
-        self.rag = rag
+        self.rag = rag or EnhancedFashionRAG(config)
         self.image_base_path = image_base_path
-        self.weights = {"color":0.4, "type":0.3, "usage":0.3}
+        self.feature_weights = self._load_feature_weights()
         
     def _get_image_path(self, item_id):
         """动态获取图片路径"""
