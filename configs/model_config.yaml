@@ -1,0 +1,10 @@
+rag:
+  knowledge_path: "knowledge/structured_kb.csv"
+  index_path: "knowledge/kb_index.index"
+  encoder_model: "paraphrase-multilingual-MiniLM-L12-v2"
+  
+recommender:
+  feature_weights:
+    color: 0.4
+    style: 0.3
+    material: 0.3
